@@ -1,0 +1,13 @@
+name: my-haskell-project
+version: 0.1.0
+description: A Haskell project that implements a state machine using a JSON-like structure.
+license: MIT
+author: Your Name
+maintainer: your.email@example.com
+dependencies:
+  - aeson >= 2.0
+  - base >= 4.14 && < 5
+executables:
+  my-haskell-project:
+    main: Main.main
+    source-dirs: src
