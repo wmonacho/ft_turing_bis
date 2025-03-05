@@ -13,6 +13,7 @@ import System.IO (readFile)
 import StateMachine (Action(..), Transition(..), StateMachine(..))
 import Control.Monad.IO.Class (liftIO)
 
+
 instance FromJSON Action where
     parseJSON = withText "Action" $ \t -> case t of
         "Left"  -> return StateMachine.Left
