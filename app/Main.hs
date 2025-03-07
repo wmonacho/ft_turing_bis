@@ -9,5 +9,5 @@ main = do
     case args of
         [filePath] -> do
             parsedData <- parseFile filePath
-            print parsedData
+            return ()
         _ -> putStrLn "Usage: program <file-path>"

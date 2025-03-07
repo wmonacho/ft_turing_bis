@@ -3,29 +3,31 @@
 
 module Parser where
 
+
 import Data.Aeson
 import Data.Aeson.Types (Parser)
+import Prelude hiding (read, Left, Right)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import qualified Data.ByteString.Lazy as BL
 import Data.Maybe (fromMaybe)
 import System.IO (readFile)
 import StateMachine (Action(..), Transition(..), StateMachine(..))
-import Control.Monad.IO.Class (liftIO)
-
+import Debug.Trace (trace, traceShow, traceM)
 
 instance FromJSON Action where
-    parseJSON = withText "Action" $ \t -> case t of
-        "Left"  -> return StateMachine.Left
-        "Right" -> return StateMachine.Right
+    parseJSON = withText "Action" $ \t -> trace ("Parsing Action: " ++ T.unpack t) $ case t of
+        "LEFT"  -> return StateMachine.Left
+        "RIGHT" -> return StateMachine.Right
         _       -> fail "Invalid Action"
 
 instance FromJSON Transition where
-    parseJSON = withObject "Transition" $ \v -> Transition
-        <$> v .: "read"
-        <*> v .: "toState"
-        <*> v .: "write"
-        <*> v .: "action"
+    parseJSON = withObject "Transition" $ \v -> do
+        read <- v .: "read"
+        toState <- v .: "to_state"
+        write <- v .: "write"
+        action <- v .: "action"
+        return Transition { read = read, toState = toState, write = write, action = action }
 
 instance FromJSON StateMachine where
     parseJSON = withObject "StateMachine" $ \v -> do
@@ -36,26 +38,11 @@ instance FromJSON StateMachine where
         initial <- v .: "initial"
         finals <- v .: "finals"
         transitions <- v .: "transitions"
-        
-        let invalidChars = filter (not . isChar) alphabet
-        if null invalidChars
-            then return StateMachine
-                { name = name
-                , alphabet = alphabet
-                , blank = blank
-                , states = states
-                , initial = initial
-                , finals = finals
-                , transitions = transitions
-                }
-            else fail $ "Invalid characters in alphabet: " ++ show invalidChars
+        return StateMachine { name = name, alphabet = alphabet, blank = blank, states = states, initial = initial, finals = finals, transitions = transitions }
 
--- Helper function to check if a value is a character
-isChar :: Char -> Bool
-isChar c = c >= ' ' && c <= '~'
-
-parseFile :: FilePath -> IO (Maybe StateMachine)
+parseFile :: FilePath -> IO (Either String StateMachine)
 parseFile path = do
     content <- readFile path
     let jsonData = BL.fromStrict $ TE.encodeUtf8 $ T.pack content
-    return $ decode jsonData
+    let decoded = eitherDecode jsonData :: Either String StateMachine
+    return decoded
