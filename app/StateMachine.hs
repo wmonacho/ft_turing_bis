@@ -2,8 +2,8 @@ module StateMachine where
 
 import qualified Data.Map as Map
 import Prelude hiding (read, Left, Right)
-import GHC.Generics
-import Control.Exception
+import GHC.Generics ()
+import Control.Exception ()
 
 data Action = Left | Right deriving (Show, Eq)
 
