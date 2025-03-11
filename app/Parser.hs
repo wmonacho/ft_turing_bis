@@ -84,7 +84,6 @@ parseFile path input = do
     content <- readFile path
     let jsonData = BL.fromStrict $ TE.encodeUtf8 $ T.pack content
     let decoded = eitherDecode jsonData :: Either String StateMachine
-    print decoded
     case decoded of
         E.Left err -> do
             print err
@@ -94,7 +93,7 @@ parseFile path input = do
             let invalidChars = filter (`notElem` alphabetSet) (map (:[]) input)
             if null invalidChars && blank stateMachine `notElem` map (:[]) input
                 then do
-                    print (E.Right stateMachine :: Either String StateMachine)
+                    -- | print (E.Right stateMachine :: Either String StateMachine)
                     return (E.Right stateMachine)
                 else do
                     let errMsg = "Invalid characters in input: " ++ show invalidChars

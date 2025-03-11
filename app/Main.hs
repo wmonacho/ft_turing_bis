@@ -11,7 +11,10 @@ main = do
         ["--help"] -> putStrLn usage
         [jsonFilePath, input] -> do
             parsedData <- parseFile jsonFilePath input
+            -- | Appeler la machine de Turing ici. avec pasedData (StateMachine) et input (String)
             return ()
-        _ -> putStrLn "Usage: ft_turing [-h] jsonfile input"
+        _ -> putStrLn usage
   where
-    usage = "positional arguments:\n  jsonfile    json description of the machine\n  input       input of the machine\noptional arguments:\n  -h, --help  show this help message and exit"
+    usage = "Usage: ft_turing [-h] jsonfile input\n\n" ++
+            "positional arguments:\n  jsonfile    json description of the machine\n  input       input of the machine\n" ++
+            "optional arguments:\n  -h, --help  show this help message and exit"
