@@ -60,14 +60,14 @@ remEllListPos (x:xs) p
     | p == 0 = xs
     | otherwise = x : remEllListPos xs (p-1)
 
-replaceEllListPos :: [String] -> String -> Int -> [String]
+replaceEllListPos :: [Char] -> Char -> Int -> [Char]
 replaceEllListPos [] _ _ = []
 replaceEllListPos (x:xs) v p
     | p == 0 = [v] ++ xs
     | otherwise = x : replaceEllListPos xs v (p-1)
 
-getEllListPos :: [String] -> Int -> String
-getEllListPos [] _ = "0"
+getEllListPos :: [Char] -> Int -> Char
+getEllListPos [] _ = '0'
 getEllListPos (x:xs) p
     | p == 0 = x
     | otherwise = getEllListPos xs (p-1)
@@ -75,10 +75,10 @@ getEllListPos (x:xs) p
 getTransisionFromName :: String -> StateMachine -> Maybe [Transition]
 getTransisionFromName tr_name state = Map.lookup tr_name (transitions state)
 
-getSingleTransitionFromAlphabet :: [Transition] -> String -> Transition
+getSingleTransitionFromAlphabet :: [Transition] -> Char -> Transition
 getSingleTransitionFromAlphabet [] _ = error ("No Transition found")
 getSingleTransitionFromAlphabet (x:xs) ch
-    | ch == (read x) = x
+    | ch == (head (read x)) = x
     | otherwise = getSingleTransitionFromAlphabet xs ch
 
 printTransitionList :: [Transition] -> IO ()
@@ -160,7 +160,7 @@ checkEndState :: [String] -> String -> Bool
 checkEndState final_lst curent_final = elem curent_final final_lst
 
 --  Detect infinite loop
-runTuringMachine :: [String] -> [String] -> StateMachine -> [Transition] -> Int -> String -> Int -> String -> IO ()
+runTuringMachine :: [Char] -> [Char] -> StateMachine -> [Transition] -> Int -> String -> Int -> String -> IO ()
 runTuringMachine [] [] _ _ _ _ _ _ = return ()
 runTuringMachine ts back_ts turing_machine turing_state index current_state max_ell previous_char = do
     let current_char = 
@@ -169,7 +169,7 @@ runTuringMachine ts back_ts turing_machine turing_state index current_state max_
             else getEllListPos back_ts (-index - 1)
     let current_transition = getSingleTransitionFromAlphabet turing_state current_char
     let next_state = getTransisionFromName (toState current_transition) turing_machine
-    printWithIndex (convertToChars ts) (convertToChars back_ts) index max_ell
+    printWithIndex ts back_ts index max_ell
     printTransition current_transition current_state
     case next_state of
         Nothing -> do
@@ -182,13 +182,13 @@ runTuringMachine ts back_ts turing_machine turing_state index current_state max_
                 error ("Error Machine probable infinite loop")
             else if (read current_transition) /= (write current_transition) then do
                 if index < 0 then do
-                    let updated_input = replaceEllListPos back_ts (write current_transition) (-index - 1)
+                    let updated_input = replaceEllListPos back_ts (head (write current_transition)) (-index - 1)
                     if (action current_transition) == Right then do
                         runTuringMachine ts updated_input turing_machine transitions (index + 1) (toState current_transition) max_ell (read current_transition)
                     else do
                         runTuringMachine ts updated_input turing_machine transitions (index - 1) (toState current_transition) max_ell (read current_transition)
                 else do
-                    let updated_input = replaceEllListPos ts (write current_transition) index
+                    let updated_input = replaceEllListPos ts (head (write current_transition)) index
                     if (action current_transition) == Right then do
                         runTuringMachine updated_input back_ts turing_machine transitions (index + 1) (toState current_transition) max_ell (read current_transition)
                     else do
