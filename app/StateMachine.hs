@@ -17,7 +17,7 @@ data Transition = Transition {
 data StateMachine = StateMachine {
     name :: String,
     alphabet :: [String],
-    blank :: String,
+    blank :: [Char],
     states :: [String],
     initial :: String,
     finals :: [String],

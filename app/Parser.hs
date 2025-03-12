@@ -24,7 +24,7 @@ import System.IO (readFile)
 import StateMachine (Action(..), Transition(..), StateMachine(..))
 import Debug.Trace (trace, traceShow, traceM)
 import qualified Data.Either as E
-import Data.List ((\\))
+import Data.List ((\\), nub)
 import qualified Data.Map as Map
 
 instance FromJSON Action where
@@ -65,17 +65,34 @@ instance FromJSON StateMachine where
             then fail "Initial state must be part of the states"
         else if any (`notElem` states) finals
             then fail "All final states must be part of the states"
+        else if length (nub states) < 2
+            then fail "There must be at least two different states"
+        else if initial `elem` finals
+            then fail "Initial state and final states must be different"
         else do
-            let allTransitions = concatMap snd (Map.toList transitions)
-            let invalidReads = filter (\t -> length (read t) /= 1 || read t `notElem` alphabet) allTransitions
-            let invalidToStates = filter (\t -> toState t `notElem` states) allTransitions
-            let invalidWrites = filter (\t -> length (write t) /= 1 || write t `notElem` alphabet) allTransitions
-            if not (null invalidReads)
-                then fail $ "Invalid read in transitions: " ++ show (map read invalidReads)
-            else if not (null invalidToStates)
-                then fail $ "Invalid to_state in transitions: " ++ show (map toState invalidToStates)
-            else if not (null invalidWrites)
-                then fail $ "Invalid write in transitions: " ++ show (map write invalidWrites)
+            let transitionGroups = Map.elems transitions
+            let invalidGroups = filter (\ts -> length (nub (map toState ts)) < 2) transitionGroups
+            let initialTransitions = Map.lookup initial transitions
+            case initialTransitions of
+                Nothing -> fail "Initial state must have at least one transition"
+                Just ts -> if null ts
+                    then fail "Initial state must have at least one transition"
+                    else return ()
+            if not (null invalidGroups)
+                then fail "Each state must have at least two transitions with different to_state values"
+            else if not (any (`elem` finals) (concatMap (\t -> [toState t]) (concatMap snd (Map.toList transitions))))
+                then fail "There must be at least one to_state equal to at least one final state in all transitions"
+            else do
+                let allTransitions = concatMap snd (Map.toList transitions)
+                let invalidReads = filter (\t -> length (read t) /= 1 || read t `notElem` alphabet) allTransitions
+                let invalidToStates = filter (\t -> toState t `notElem` states) allTransitions
+                let invalidWrites = filter (\t -> length (write t) /= 1 || write t `notElem` alphabet) allTransitions
+                if not (null invalidReads)
+                    then fail $ "Invalid read in transitions: " ++ show (map read invalidReads)
+                else if not (null invalidToStates)
+                    then fail $ "Invalid to_state in transitions: " ++ show (map toState invalidToStates)
+                else if not (null invalidWrites)
+                    then fail $ "Invalid write in transitions: " ++ show (map write invalidWrites)
                 else return StateMachine { name = name, alphabet = alphabet, blank = blank, states = states, initial = initial, finals = finals, transitions = transitions }
 
 
