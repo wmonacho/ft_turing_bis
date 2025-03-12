@@ -198,3 +198,5 @@ runTuringMachine ts back_ts turing_machine turing_state index current_state max_
                     runTuringMachine ts back_ts turing_machine transitions (index + 1) (toState current_transition) max_ell (read current_transition)
                 else do
                     runTuringMachine ts back_ts turing_machine transitions (index - 1) (toState current_transition) max_ell (read current_transition)
+
+-- ..0011..
