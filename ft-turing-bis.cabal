@@ -30,7 +30,7 @@ executable ft-turing-bis
 
     -- LANGUAGE extensions used by modules in this package.
     other-extensions: FlexibleInstances
-    build-depends:      base ^>=4.15.1.0,
+    build-depends:      base ^>=4.17.2.1,
                         aeson,
                         bytestring,
                         text,
