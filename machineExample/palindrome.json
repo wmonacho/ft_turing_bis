@@ -1,0 +1,41 @@
+{
+    "name": "palindrome_detector",
+    "alphabet": ["0", "1", ".", "y", "n"],
+    "blank": ".",
+    "states": ["scanright", "checkright", "checkleft", "moveleft", "moveright", "writeyes", "writeno", "HALT"],
+    "initial": "scanright",
+    "finals": ["HALT"],
+    "transitions": {
+        "scanright": [
+            { "read": ".", "to_state": "checkright", "write": ".", "action": "LEFT" },
+            { "read": "0", "to_state": "scanright", "write": "0", "action": "RIGHT" },
+            { "read": "1", "to_state": "scanright", "write": "1", "action": "RIGHT" }
+        ],
+        "checkright": [
+            { "read": "0", "to_state": "moveleft", "write": ".", "action": "LEFT" },
+            { "read": "1", "to_state": "moveleft", "write": ".", "action": "LEFT" },
+            { "read": ".", "to_state": "writeyes", "write": ".", "action": "RIGHT" }
+        ],
+        "moveleft": [
+            { "read": "0", "to_state": "moveleft", "write": "0", "action": "LEFT" },
+            { "read": "1", "to_state": "moveleft", "write": "1", "action": "LEFT" },
+            { "read": ".", "to_state": "checkleft", "write": ".", "action": "LEFT" }
+        ],
+        "checkleft": [
+            { "read": "0", "to_state": "moveright", "write": ".", "action": "RIGHT" },
+            { "read": "1", "to_state": "moveright", "write": ".", "action": "RIGHT" },
+            { "read": ".", "to_state": "writeno", "write": ".", "action": "RIGHT" }
+        ],
+        "moveright": [
+            { "read": "0", "to_state": "moveright", "write": "0", "action": "RIGHT" },
+            { "read": "1", "to_state": "moveright", "write": "1", "action": "RIGHT" },
+            { "read": ".", "to_state": "scanright", "write": ".", "action": "RIGHT" }
+        ],
+        "writeyes": [
+            { "read": ".", "to_state": "HALT", "write": "y", "action": "RIGHT" }
+        ],
+        "writeno": [
+            { "read": ".", "to_state": "HALT", "write": "n", "action": "RIGHT" }
+        ]
+    }
+}
