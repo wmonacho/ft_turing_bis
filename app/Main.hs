@@ -18,7 +18,6 @@ main = do
         ["--help"] -> putStrLn usage
         [jsonFilePath, input] -> do
             parseData <- parseFile jsonFilePath input
-            -- | Appeler la machine de Turing ici. avec pasedData (StateMachine) et input (String)
             case parseData of
                 Left err -> putStrLn ("Error: " ++ err)
                 Right sm -> do
