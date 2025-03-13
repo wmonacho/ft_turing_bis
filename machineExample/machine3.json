@@ -1,0 +1,61 @@
+{
+    "name" : "Machine 3",
+    "alphabet": [ "1", "0", ".", "n", "y", "x" ],
+    "blank" : ".",
+    "states" : [ "checkzero", "checkzerofirst", "writeresult", "checkone", "endno", "checkendzero", "checkendone", "finalendone", "HALT" ],
+    "initial" : "checkzerofirst",
+    "finals" : [ "HALT" ],
+    "transitions" : {
+        "writeresult": [
+            { "read" : "0", "to_state": "HALT", "write": ".", "action": "RIGHT"},
+            { "read" : "1", "to_state": "HALT", "write": ".", "action": "RIGHT"},
+            { "read" : ".", "to_state": "HALT" , "write": ".", "action": "RIGHT" },
+            { "read" : "y", "to_state": "HALT" , "write": ".", "action": "RIGHT" },
+            { "read" : "n", "to_state": "HALT" , "write": ".", "action": "RIGHT" },
+            { "read" : "x", "to_state": "HALT" , "write": ".", "action": "RIGHT" }
+        ],
+        "endno": [
+            { "read" : "0", "to_state": "endno", "write": "0", "action": "RIGHT"},
+            { "read" : "1", "to_state": "endno", "write": "1", "action": "RIGHT"},
+            { "read" : "y", "to_state": "endno" , "write": ".", "action": "RIGHT" },
+            { "read" : "n", "to_state": "endno" , "write": ".", "action": "RIGHT" },
+            { "read" : "x", "to_state": "endno" , "write": ".", "action": "RIGHT" },
+
+            { "read" : ".", "to_state": "writeresult" , "write": "n", "action": "RIGHT" }
+        ],
+        "checkzerofirst": [
+            { "read" : "0", "to_state": "checkzero", "write": "0", "action": "RIGHT"},
+            { "read" : "x", "to_state": "endno", "write": "x", "action": "RIGHT"},
+            { "read" : "1", "to_state": "endno", "write": "1", "action": "RIGHT"},
+            { "read" : ".", "to_state": "writeresult" , "write": "n", "action": "RIGHT" }
+        ],
+        "checkzero": [
+            { "read" : "0", "to_state": "checkzero", "write": "0", "action": "RIGHT"},
+            { "read" : "x", "to_state": "endno", "write": "x", "action": "RIGHT"},
+            { "read" : "1", "to_state": "checkone", "write": "1", "action": "LEFT"},
+            { "read" : ".", "to_state": "writeresult" , "write": "n", "action": "RIGHT" }
+        ],
+        "checkone": [
+            { "read" : "0", "to_state": "checkendone", "write": "x", "action": "RIGHT"},
+            { "read" : ".", "to_state": "writeresult" , "write": "n", "action": "RIGHT" }
+        ],
+        "checkendzero": [
+            { "read" : "0", "to_state": "checkendone", "write": "x", "action": "RIGHT"},
+            { "read" : "x", "to_state": "checkendzero", "write": "x", "action": "LEFT"},
+            { "read" : "1", "to_state": "endno", "write": "1", "action": "RIGHT"},
+            { "read" : ".", "to_state": "finalendone" , "write": ".", "action": "RIGHT" }
+        ],
+        "checkendone": [
+            { "read" : "0", "to_state": "endno", "write": "0", "action": "RIGHT"},
+            { "read" : "x", "to_state": "checkendone", "write": "x", "action": "RIGHT"},
+            { "read" : "1", "to_state": "checkendzero", "write": "x", "action": "LEFT"},
+            { "read" : ".", "to_state": "writeresult" , "write": "n", "action": "RIGHT" }
+        ],
+        "finalendone": [
+            { "read" : "0", "to_state": "endno", "write": "0", "action": "RIGHT"},
+            { "read" : "1", "to_state": "endno", "write": "x", "action": "RIGHT"},
+            { "read" : "x", "to_state": "finalendone", "write": "x", "action": "RIGHT"},
+            { "read" : ".", "to_state": "writeresult" , "write": "y", "action": "RIGHT" }
+        ]
+    }
+}
