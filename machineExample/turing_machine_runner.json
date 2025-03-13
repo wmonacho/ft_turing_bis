@@ -1,0 +1,25 @@
+{
+    "name": "turing_machine_runner",
+    "alphabet": ["1", ".", "-", "=", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],
+    "blank": ".",
+    "states": ["read_input", "execute_unary_sub", "HALT"],
+    "initial": "read_input",
+    "finals": ["HALT"],
+    "transitions": {
+        "read_input": [
+            { "read": "a", "to_state": "execute_unary_sub", "write": "a", "action": "RIGHT" }
+        ],
+        "execute_unary_sub": [
+            { "read": ".", "to_state": "execute_unary_sub", "write": ".", "action": "RIGHT" },
+            { "read": "1", "to_state": "execute_unary_sub", "write": "1", "action": "RIGHT" },
+            { "read": "-", "to_state": "execute_unary_sub", "write": "-", "action": "RIGHT" },
+            { "read": "=", "to_state": "eraseone", "write": ".", "action": "LEFT" },
+            { "read": "1", "to_state": "eraseone", "write": "=", "action": "LEFT" },
+            { "read": "-", "to_state": "HALT", "write": ".", "action": "LEFT" },
+            { "read": "1", "to_state": "subone", "write": "1", "action": "LEFT" },
+            { "read": "-", "to_state": "skip", "write": "-", "action": "LEFT" },
+            { "read": ".", "to_state": "skip", "write": ".", "action": "LEFT" },
+            { "read": "1", "to_state": "scanright", "write": ".", "action": "RIGHT" }
+        ]
+    }
+}
