@@ -70,9 +70,8 @@ instance FromJSON StateMachine where
         else if initial `elem` finals
             then fail "Initial state and final states must be different"
         else do
-            let transitionGroups = Map.elems transitions
-            let invalidGroups = filter (\ts -> let uniqueToStates = nub (map toState ts)
-                                               in length uniqueToStates < 2 && not (all (`elem` finals) uniqueToStates)) transitionGroups
+            let transitionGroups = Map.toList transitions
+            let invalidGroups = filter (\(state, ts) -> all (\t -> toState t == state) ts) transitionGroups
             let initialTransitions = Map.lookup initial transitions
             case initialTransitions of
                 Nothing -> fail "Initial state must have at least one transition"
@@ -80,7 +79,7 @@ instance FromJSON StateMachine where
                     then fail "Initial state must have at least one transition"
                     else return ()
             if not (null invalidGroups)
-                then fail "Each state must have at least two transitions with different to_state values"
+                then fail "Each state must have at least one transition with a to_state different from the state's name"
             else if not (any (`elem` finals) (concatMap (\t -> [toState t]) (concatMap snd (Map.toList transitions))))
                 then fail "There must be at least one to_state equal to at least one final state in all transitions"
             else do
@@ -103,18 +102,10 @@ parseFile path input = do
     let jsonData = BL.fromStrict $ TE.encodeUtf8 $ T.pack content
     let decoded = eitherDecode jsonData :: Either String StateMachine
     case decoded of
-        E.Left err -> do
-            print err
-            return (E.Left err)
+        E.Left err -> return (E.Left err)
         E.Right stateMachine -> do
             let alphabetSet = alphabet stateMachine
             let invalidChars = filter (`notElem` alphabetSet) (map (:[]) input)
             if null invalidChars && blank stateMachine `notElem` map (:[]) input
-                then do
-                    -- | print (E.Right stateMachine :: Either String StateMachine)
-                    return (E.Right stateMachine)
-                else do
-                    let errMsg = "Invalid characters in input: " ++ show invalidChars
-                    print errMsg
-                    return (E.Left errMsg)
-    return decoded
+                then return (E.Right stateMachine)
+            else return (E.Left $ "Invalid characters in input: " ++ show invalidChars)
