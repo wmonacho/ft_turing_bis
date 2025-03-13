@@ -2,8 +2,8 @@
     "name" : "Machine 3",
     "alphabet": [ "1", "0", ".", "n", "y", "x" ],
     "blank" : ".",
-    "states" : [ "checkzero", "writeresult", "checkone", "endno", "checkendzero", "checkendone", "finalendone", "HALT" ],
-    "initial" : "checkzero",
+    "states" : [ "checkzero", "checkzerofirst", "writeresult", "checkone", "endno", "checkendzero", "checkendone", "finalendone", "HALT" ],
+    "initial" : "checkzerofirst",
     "finals" : [ "HALT" ],
     "transitions" : {
         "writeresult": [
@@ -21,6 +21,12 @@
             { "read" : "n", "to_state": "endno" , "write": ".", "action": "RIGHT" },
             { "read" : "x", "to_state": "endno" , "write": ".", "action": "RIGHT" },
 
+            { "read" : ".", "to_state": "writeresult" , "write": "n", "action": "RIGHT" }
+        ],
+        "checkzerofirst": [
+            { "read" : "0", "to_state": "checkzero", "write": "0", "action": "RIGHT"},
+            { "read" : "x", "to_state": "endno", "write": "x", "action": "RIGHT"},
+            { "read" : "1", "to_state": "endno", "write": "1", "action": "RIGHT"},
             { "read" : ".", "to_state": "writeresult" , "write": "n", "action": "RIGHT" }
         ],
         "checkzero": [
