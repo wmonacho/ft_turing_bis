@@ -71,7 +71,8 @@ instance FromJSON StateMachine where
             then fail "Initial state and final states must be different"
         else do
             let transitionGroups = Map.elems transitions
-            let invalidGroups = filter (\ts -> length (nub (map toState ts)) < 2) transitionGroups
+            let invalidGroups = filter (\ts -> let uniqueToStates = nub (map toState ts)
+                                               in length uniqueToStates < 2 && not (all (`elem` finals) uniqueToStates)) transitionGroups
             let initialTransitions = Map.lookup initial transitions
             case initialTransitions of
                 Nothing -> fail "Initial state must have at least one transition"

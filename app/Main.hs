@@ -16,7 +16,6 @@ main = do
                 Left err -> putStrLn $ "Error: " ++ err
                 Right stateMachine -> do
                     -- Appeler la machine de Turing ici avec stateMachine (StateMachine) et input (String)
-                    print (blank stateMachine)
                     putStrLn "StateMachine parsed successfully"
                     -- Ajoutez ici le code pour utiliser stateMachine et input
                     return ()
