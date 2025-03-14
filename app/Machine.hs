@@ -115,8 +115,6 @@ runTuringMachine ts back_ts turing_machine turing_state index current_state max_
         Just transitions -> do
             if (checkEndState (finals turing_machine) current_state) then return ()
             else if (index < 0 || index > max_ell) && previous_char == (blank turing_machine) && previous_char == (read current_transition) then do
-                print previous_char
-                print (read current_transition)
                 error ("Error Machine probable infinite loop")
             else if (read current_transition) /= (write current_transition) then do
                 if index < 0 then do
