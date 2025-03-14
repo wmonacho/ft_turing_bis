@@ -1,11 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE EmptyCase #-}
 
 module Parser where
-
 import Data.Aeson
+-- import Data.Aeson.WarningParser
 import Data.Aeson.Types (Parser)
-import Prelude hiding (read, Left, Right)
+import qualified Data.Aeson.KeyMap as KM
+import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import qualified Data.ByteString.Lazy as BL
@@ -16,6 +19,7 @@ import Debug.Trace (trace, traceShow, traceM)
 import qualified Data.Either as E
 import Data.List ((\\), nub)
 import qualified Data.Map as Map
+import Prelude as P hiding (read, Left, Right)
 
 instance FromJSON Action where
     parseJSON = withText "Action" $ \t -> case t of
@@ -55,6 +59,8 @@ instance FromJSON StateMachine where
             (True, errMsg):_ -> fail errMsg
             _ -> do
                 let transitionGroups = Map.toList transitions
+                let stateNames = map fst transitionGroups
+                let duplicateStates = stateNames \\ nub stateNames
                 let invalidGroups = filter (\(state, ts) -> all (\t -> toState t == state) ts) transitionGroups
                 let initialTransitions = Map.lookup initial transitions
                 case initialTransitions of
@@ -68,18 +74,24 @@ instance FromJSON StateMachine where
                     then fail "There must be at least one to_state equal to at least one final state in all transitions"
                 else do
                     let allTransitions = concatMap snd (Map.toList transitions)
-                    let invalidReads = filter (\t -> length (read t) /= 1 || read t `notElem` alphabet) allTransitions
+                    let invalidReads = filter (\t -> length (StateMachine.read t) /= 1 || StateMachine.read t `notElem` alphabet) allTransitions
                     let invalidToStates = filter (\t -> toState t `notElem` states) allTransitions
                     let invalidWrites = filter (\t -> length (write t) /= 1 || write t `notElem` alphabet) allTransitions
                     let invalidTransitionStates = filter (\(state, _) -> state `notElem` states) transitionGroups
-                    let transitionChecks = [ (not (null invalidReads), "Invalid read in transitions: " ++ show (map read invalidReads))
-                                           , (not (null invalidToStates), "Invalid to_state in transitions: " ++ show (map toState invalidToStates))
-                                           , (not (null invalidWrites), "Invalid write in transitions: " ++ show (map write invalidWrites))
-                                           , (not (null invalidTransitionStates), "Invalid state in transitions: " ++ show (map fst invalidTransitionStates))
-                                           ]
-                    case filter fst transitionChecks of
-                        (True, errMsg):_ -> fail errMsg
-                        _ -> return StateMachine { name = name, alphabet = alphabet, blank = blank, states = states, initial = initial, finals = finals, transitions = transitions }
+                    let transitionChecks = [ (not (null invalidReads), "Invalid read in transitions: " ++ show (map StateMachine.read invalidReads))
+                                        , (not (null invalidToStates), "Invalid to_state in transitions: " ++ show (map toState invalidToStates))
+                                        , (not (null invalidWrites), "Invalid write in transitions: " ++ show (map write invalidWrites))
+                                        , (not (null invalidTransitionStates), "Invalid state in transitions: " ++ show (map fst invalidTransitionStates))
+                                        ]
+                    let invalidStates = (states \\ map fst transitionGroups) \\ finals
+                    if not (null invalidStates)
+                        then fail $ "Invalid states in transitions: " ++ show invalidStates
+                    else if any (\(state, _) -> state `elem` finals) transitionGroups
+                        then fail "Transition groups must not have the same name as final states"
+                    else
+                        case filter fst transitionChecks of
+                                    (True, errMsg):_ -> fail errMsg
+                                    _ -> return StateMachine { name = name, alphabet = alphabet, blank = blank, states = states, initial = initial, finals = finals, transitions = transitions }
 
 parseFile :: FilePath -> String -> IO (Either String StateMachine)
 parseFile path input = do
