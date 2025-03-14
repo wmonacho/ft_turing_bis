@@ -2,16 +2,22 @@
     "name" : "unary_add",
     "alphabet": [ "1", ".", "+", "=" ],
     "blank" : ".",
-    "states" : [ "scanright", "eraseone", "subone", "skip", "HALT" ],
+    "states" : [ "scanright", "eraseone", "subone", "skip", "HALT", "writeresult" ],
     "initial" : "scanright",
     "finals" : [ "HALT" ],
     "transitions" : {
+        "writeresult": [
+            { "read" : "1", "to_state": "HALT", "write": ".", "action": "RIGHT"},
+            { "read" : ".", "to_state": "HALT" , "write": ".", "action": "RIGHT" },
+            { "read" : "+", "to_state": "HALT" , "write": ".", "action": "RIGHT" },
+            { "read" : "=", "to_state": "HALT" , "write": ".", "action": "RIGHT" }
+        ],
         "scanright": [
             { "read" : "1", "to_state": "scanright", "write": "1", "action": "RIGHT"},
             { "read" : "+", "to_state": "skip", "write": "1", "action": "RIGHT"}
         ],
         "eraseone": [
-            { "read" : "1", "to_state": "HALT", "write": ".", "action": "RIGHT"}
+            { "read" : "1", "to_state": "writeresult", "write": ".", "action": "RIGHT"}
         ],
         "skip": [
             { "read" : "1", "to_state": "skip", "write": "1", "action": "RIGHT"},
