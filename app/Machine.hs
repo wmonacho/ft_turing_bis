@@ -6,60 +6,6 @@ import Data.List (intercalate)
 import Parser
 import StateMachine
 
-returnStr :: String -> IO String
-returnStr str = do
-    putStrLn str
-    return str
-
-multiplyByTwo :: Int -> Int
-multiplyByTwo value = do
-    value * 2
-
-evenOrOdd :: Int -> String
-evenOrOdd value
-    | mod value 2 == 1 = "Odd"
-    | otherwise = "Even"
-
-printList :: Show a => [a] -> IO ()
-printList [] = return ()
-printList (x:xs) = do
-    print x
-    printList xs
-
-printListReverse :: [Char] -> IO ()
-printListReverse [] = return ()
-printListReverse (x:xs) = do
-    printListReverse xs
-    print x
-
-addEllListEnd :: [Char] -> Char -> [Char]
-addEllListEnd [] v = [v]
-addEllListEnd (x:xs) v = x : addEllListEnd xs v
-
-addEllListBeg :: [Char] -> Char -> [Char]
-addEllListBeg xs v = [v] ++ xs
-
-addEllListPos :: [Char] -> Char -> Int -> [Char]
-addEllListPos [] v _ = [v]
-addEllListPos (x:xs) v p
-    | p == 0 = [v] ++ [x] ++ xs
-    | otherwise = x : addEllListPos xs v (p-1)
-
-remEllListBeg :: [Char] -> [Char]
-remEllListBeg [] = []
-remEllListBeg (_:xs) = xs
-
-remEllListEnd :: [Char] -> [Char]
-remEllListEnd [] = []
-remEllListEnd [_] = []
-remEllListEnd (x:xs) = x:remEllListEnd xs
-
-remEllListPos :: [Char] -> Int -> [Char]
-remEllListPos [] _ = []
-remEllListPos (x:xs) p
-    | p == 0 = xs
-    | otherwise = x : remEllListPos xs (p-1)
-
 replaceEllListPos :: [Char] -> Char -> Int -> [Char]
 replaceEllListPos [] _ _ = []
 replaceEllListPos (x:xs) v p
@@ -93,9 +39,6 @@ printTransitionList (x:xs) = do
     else putStrLn "Left"
     printTransitionList xs
 
-convertToChars :: [String] -> [Char]
-convertToChars = concatMap id
-
 printWithIndex :: [Char] -> [Char] -> Int -> Int -> IO ()
 printWithIndex lst back_lst idx max_ell = do
     if idx < 0 then do
@@ -123,11 +66,6 @@ printWithIndex lst back_lst idx max_ell = do
         let toPrint = "[" ++ reverse (take 10 back_lst) ++ "]"
         putStr toPrint
         putStr result
-
-printCharListRaw :: [String] -> IO ()
-printCharListRaw lst = do
-    -- putStrLn $ "[" ++ intercalate ", " (map (:[]) lst) ++ "]"
-    putStrLn $ "[ ]"
 
 printStringListRaw :: [String] -> IO ()
 printStringListRaw lst = do
@@ -198,5 +136,3 @@ runTuringMachine ts back_ts turing_machine turing_state index current_state max_
                     runTuringMachine ts back_ts turing_machine transitions (index + 1) (toState current_transition) max_ell (read current_transition)
                 else do
                     runTuringMachine ts back_ts turing_machine transitions (index - 1) (toState current_transition) max_ell (read current_transition)
-
--- ..0000..
