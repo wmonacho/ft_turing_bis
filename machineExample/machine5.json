@@ -1,0 +1,31 @@
+{
+    "name" : "Machine 5",
+    "alphabet": [ "0", ".", "n", "y" ],
+    "blank" : ".",
+    "states" : [ "checkzero", "writeresult", "checkzeroeven", "endno", "HALT" ],
+    "initial" : "checkzero",
+    "finals" : [ "HALT" ],
+    "transitions" : {
+        "writeresult": [
+            { "read" : "0", "to_state": "HALT", "write": ".", "action": "RIGHT"},
+            { "read" : ".", "to_state": "HALT" , "write": ".", "action": "RIGHT" },
+            { "read" : "y", "to_state": "HALT" , "write": ".", "action": "RIGHT" },
+            { "read" : "n", "to_state": "HALT" , "write": ".", "action": "RIGHT" }
+        ],
+        "endno": [
+            { "read" : "0", "to_state": "endno", "write": "0", "action": "RIGHT"},
+            { "read" : "y", "to_state": "endno" , "write": ".", "action": "RIGHT" },
+            { "read" : "n", "to_state": "endno" , "write": ".", "action": "RIGHT" },
+
+            { "read" : ".", "to_state": "writeresult" , "write": "n", "action": "RIGHT" }
+        ],
+        "checkzero": [
+            { "read" : "0", "to_state": "checkzeroeven", "write": "0", "action": "RIGHT"},
+            { "read" : ".", "to_state": "writeresult" , "write": "y", "action": "RIGHT" }
+        ],
+        "checkzeroeven": [
+            { "read" : "0", "to_state": "checkzero", "write": "0", "action": "RIGHT"},
+            { "read" : ".", "to_state": "endno" , "write": ".", "action": "LEFT" }
+        ]
+    }
+}
